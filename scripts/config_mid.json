@@ -1,0 +1,287 @@
+{
+    "global": {
+        "output_root": "./results_n2000_mid",
+        "main_seed": 3300000,
+        "thread_num": 64
+    },
+    "template": {
+        "n": 500,
+        "points_limit": 40,
+        "lines_limit": 60,
+        "output_dir": "./results_n2000_mid/json/base",
+        "output_filename": "base_templates.jsonl",
+        "base": {
+            "types": ["polygon", "circle", "special_triangle", "special_rectangle", "parallelogram", "trapezoid"],
+            "type_weights": {
+                "polygon": 0.2,
+                "circle": 0.2,
+                "special_triangle": 0.25,
+                "special_rectangle": 0.15,
+                "parallelogram": 0.15,
+                "trapezoid": 0.15
+            },
+            "polygon": {
+                "n_choices": [3, 4, 5, 6, 8],
+                "side_range": [1, 10],
+                "rotation_choices_type": "pi_over_2n"
+            },
+            "circle": {
+                "radius_range": [1, 10],
+                "start_angle": 0
+            },
+            "special_triangle": {
+                "isosceles": {
+                    "angle_choices": [30, 45, 60, 90, 120], 
+                    "length_type": "either",  
+                    "length_range": [1, 10], 
+                    "rotate": {
+                        "enable": false,
+                        "modes": ["original", "flip_vertical"]
+                    }
+                },
+                "right": {
+                    "ratio_mode": "either",
+                    "manual_ratios": [ 
+                        [1, 1],
+                        [1, "sqrt(3)"],
+                        [1, "sqrt(2)"],
+                        [1, 2],
+                        [1, 3],
+                        ["sqrt(3)", "sqrt(2)"],
+                        [3, 4],
+                        [5, 12]
+                    ],
+                    "random_pool_range": [1, 5], 
+                    "rotate": {
+                        "enable": false,
+                        "modes": ["original", "rotate_90", "rotate_180", "rotate_270"]
+                    }
+                }
+            },
+            "special_rectangle": {
+                "ratio_mode": "either", 
+                "manual_ratios": [ 
+                    [1, 2],
+                    [1, "sqrt(3)"],
+                    [1, "sqrt(2)"],
+                    ["sqrt(2)", "sqrt(3)"],
+                    [1, 3],
+                    [2, 3],
+                    [3, 4],
+                    [5, 12]
+                ],
+                "random_range": [1, 5], 
+                "rotate": {
+                    "enable": false,
+                    "modes": ["original", "swap_ratio"]
+                }
+            },
+            "parallelogram": {
+                "base_range": [2, 6],
+                "height_range": [1, 5],
+                "angle_choices": [30, 45, 60, 120, 135, 150],
+                "rotate": {
+                    "enable": false,
+                    "modes": ["original", "flip_horizontal"]
+                }
+            },
+            "trapezoid": {
+                "isosceles": {
+                    "base1_range": [4, 8],
+                    "base2_range": [1, 6],
+                    "height_range": [1, 5],
+                    "rotate": {
+                        "enable": false,
+                        "modes": ["original", "flip_vertical"]
+                    }
+                }
+            }
+        },
+        "derivation": {
+            "round_range": [2, 4],
+            "mode": "sequential",
+            "rules": {
+                "circle": {
+                    "supported_rules": [
+                    {"name": "concentric", "prob": 0.2, "scale_choices": [0.5, 2]},
+                    {"name": "translation", "prob": 0.35},
+                    {"name": "circum_inscribe", "prob": 0.2, "n_choices": [3, 4, 6]},
+                    {"name": "vertex_on_center", "prob": 0.25, "n_choices": [3, 4, 6], "param_choices" : ["side_length", "radius"]}
+                    ]
+                },
+                "polygon": {
+                    "supported_rules": [
+                    {"name": "concentric", "prob": 0.2, "scale_choices": [0.5, 2]},
+                    {"name": "translation", "prob": 0.35},
+                    {"name": "circum_inscribe", "prob": 0.3, "n_choices": [3, 4, 6]},
+                    {"name": "vertex_on_center", "prob": 0.25, "n_choices": [3, 4, 6], "param_choices" : ["side_length", "radius"]},
+                    {"name": "side_polygon", "prob": 0.35, "n_choices": [3, 4, 6]}
+                    ]
+                },
+                "special_triangle": {
+                    "supported_rules": [
+                    {"name": "circum_inscribe", "prob": 0.4},
+                    {"name": "translation", "prob": 0.35},
+                    {"name": "side_polygon", "prob": 0.4, "n_choices": [3, 4, 6]}
+                    ]
+                },
+                "special_rectangle": {
+                    "supported_rules": [
+                    {"name": "concentric", "prob": 0.2},
+                    {"name": "circum_inscribe", "prob": 0.2},
+                    {"name": "translation", "prob": 0.3},
+                    {"name": "side_polygon", "prob": 0.4, "n_choices": [3, 4, 6]}
+                    ]
+                },
+                "parallelogram": {
+                    "supported_rules": [
+                    {"name": "concentric", "prob": 0.25},
+                    {"name": "translation", "prob": 0.4},
+                    {"name": "side_polygon", "prob": 0.4, "n_choices": [3, 4, 6]}
+                    ]
+                },
+                "trapezoid": {
+                    "supported_rules": [
+                    {"name": "concentric", "prob": 0.25},
+                    {"name": "translation", "prob": 0.4},
+                    {"name": "side_polygon", "prob": 0.4, "n_choices": [3, 4, 6]}
+                    ]
+                }
+            }
+        }
+    },
+    "builder": {
+        "output_dir": "./results_n2000_mid/json/enhanced",
+        "output_filename": "enhanced_geometries.jsonl",
+        "num_enhancements": 5,
+        "rounds_distribution": {
+            "0": 1,
+            "1": 3,
+            "2": 1
+        },
+        "min_operations_per_round": 1,
+        "max_operations_per_round": 1,
+        "allowed_operation_types": [
+            "connect_points", 
+            "connect_midpoints", 
+            "draw_perpendicular",
+            "draw_diameter"
+        ],
+        "operation_probs": {
+            "draw_diameter": 0.1,
+            "connect_points": 0.3,
+            "connect_midpoints": 0.3,
+            "draw_perpendicular": 0.3
+        },
+        "operation_constraints": {
+            "connect_points": {
+                "entity_types": ["polygon", "composite"],
+                "allow_isolated": false 
+            },
+            "connect_midpoints": {
+                "entity_types": ["polygon", "composite"], 
+                "mode_probs": {"two_midpoints": 0.3, "vertex_and_midpoint": 0.7}, 
+                "allow_endpoint": false
+            },
+            "draw_perpendicular": {
+                "entity_types": ["polygon", "composite"]
+            },
+            "draw_diameter": {
+                "entity_types": ["circle"], 
+                "directions": ["horizontal", "vertical"] 
+            }
+        }
+    },
+    "drawer": {
+        "output_dir": "./results_n2000_mid/images/raw",
+        "canvas_size": [1600, 1200],
+        "margin": 50,
+        "line_color": "#000000",
+        "line_width": 3
+    },
+    "region_extractor": {
+        "thresh": 200,
+        "binarize_mode": "fixed",
+        "fill_holes": true,
+        "arc_detect": true, 
+        "curvature_threshold": 0.005
+    },
+    "shader": {
+        "enabled": true,
+        "n_regions": [1, 4], 
+        "x_attempts": 5,
+        "min_pixel_area": 100, 
+        "shadow_types": ["hatch", "solid", "crosshatch", "gradient"],
+        "hatch_spacing": 5,
+        "crosshatch_spacing": 6,
+        "adjacent_threshold": 5.0,
+        "intensity_range": [0.4, 0.8],
+        "distance_threshold": 12,
+        "match_threshold": 0.8,
+        "match_threshold_arc": 0.7,
+        "min_sample_points": 20
+    },
+    "gt": {
+        "simplify_level": "full",
+        "include_units": false
+    },
+    "annotator": {
+        "enabled": true, 
+        "center_point": false,
+        "point": {
+            "enabled": true, 
+            "radius": 5,
+            "color": [0, 0, 255], 
+            "text": {
+                "enabled": true,
+                "size": 18,
+                "color": [0, 0, 0],
+                "offset": 14,
+                "edge_margin": 15, 
+                "min_pixel_dist": 1,
+                "scale": 1,
+                "thickness": 2,
+                "font": "cv2.FONT_HERSHEY_SIMPLEX",
+                "font_selection": "random"
+            }
+        },
+        "line": {
+            "enabled": false, 
+            "color": [0, 255, 0], 
+            "width": 2, 
+            "text_offset": 12, 
+            "text": {
+                "enabled": true,
+                "size": 12,
+                "color": [0, 0, 0],
+                "offset": 12,
+                "edge_margin": 5, 
+                "min_pixel_dist": 3, 
+                "scale": 0.5,
+                "thickness": 2,
+                "font": "cv2.FONT_HERSHEY_SIMPLEX",
+                "font_selection": "random"
+            }
+        },
+        "perpendicular": {
+            "enabled": false,
+            "color": [255, 0, 0],
+            "width": 2, 
+            "symbol_size": 30 
+        }
+    },
+    "qa": {
+        "question_types": ["length", "angle", "perimeter", "entity_area", "shadow_area", "shadow_ratio", "shadow_entity_ratio"],
+        "type_weights": {
+            "length": 0.6,
+            "angle": 0.2,
+            "perimeter": 0.2,
+            "entity_area": 0.2,
+            "shadow_area": 0.3,
+            "shadow_ratio": 0.2,
+            "shadow_entity_ratio": 0.1
+        },
+        "num_questions_per_geo": 1,
+        "output_dir": "./results_n2000_mid/json/qa"
+    }
+}
